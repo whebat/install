@@ -1,7 +1,24 @@
+# Install
+
 Installation steps and scripts.
+
+## Post-Installation Script
 
 ```bash
 wget -qO- https://raw.githubusercontent.com/whebat/install/main/post/fedora.sh | sh
+```
+
+## GUI Configuration
+```bash
+url=https://addons.mozilla.org/en-US/firefox/addon
+firefox \
+"$url/add-custom-search-engine/"                            \
+"$url/ublock-origin/"                                       \
+"$url/redirector/"                                          \
+"$url/multi-account-containers/"                            \
+"https://www.jetbrains.com/toolbox-app/download/other.html" \
+&
+unset url
 ```
 
 # Shell References
