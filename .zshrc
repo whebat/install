@@ -55,12 +55,17 @@ fman() {
 qrcode() {
 	qrencode -o ~/Desktop/qrcode.txt -t UTF8 -m 2 -l H "$1"
 	cat ~/Desktop/qrcode.txt
-	rm ~/Desktop/qrcode.txt
+	rm -f ~/Desktop/qrcode.txt
 }
 
-source "$HOME/.local/share/zsh/plugins/gitstatus/gitstatus.plugin.zsh"
+source "$HOME/repository/clone/gitstatus/gitstatus.plugin.zsh"
 function my_set_prompt() {
-  PROMPT='%~ '
+# Print Error Code.
+  if [ "$?" == "0" ]; then
+    PROMPT=="\[\e[0;1;32m\]➜  \[\e[0m\]"
+  else
+    PROMPT=="\[\e[0;1;91m\]➜  \[\e[0m\]"
+  fi
 
   if gitstatus_query MY && [[ $VCS_STATUS_RESULT == ok-sync ]]; then
     PROMPT+='('${${VCS_STATUS_LOCAL_BRANCH:-@${VCS_STATUS_COMMIT}}//\%/%%}  # escape %
@@ -76,7 +81,7 @@ function my_set_prompt() {
     # Use this conditional expression to configure prompt based on exit code.
     # E.g replace 'exitCodeZero' and 'exitCodeNotZero' with desired string:
     # RPROMPT+='%(?.exitCodeZero.exitCodeNotZero)'
-    PROMPT+="%(?.%#.%B%F{red}%#%f%b) "
+    PROMPT+="\[\e[0m\] \\$ "
 
   setopt no_prompt_{bang,subst} prompt_percent  # enable/disable correct prompt expansions
 }
