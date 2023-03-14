@@ -88,9 +88,7 @@ fzf                 \
 qrencode            \
 calcurse            \
 syncthing
-
 systemctl --"$username" enable --now syncthing.service # 8384
-test -d ~/Sync && rm -rf ~/Sync
 
 # Config shell.
 sudo usermod -s /usr/bin/zsh "$username"
@@ -108,7 +106,8 @@ sudo dnf install -y brave-browser
 sudo rpmkeys --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg
 
 # Flatpak
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+sudo flatpak remote-modify --enable flathub
 flatpak install -y flathub com.github.Eloston.UngoogledChromium
 flatpak install -y flathub fr.romainvigier.MetadataCleaner
 flatpak install -y flathub md.obsidian.Obsidian
@@ -127,8 +126,8 @@ cd ~/.mozilla/firefox/*.default-release || fail "$@"
 printf '1\n' | ./prefsCleaner.sh
 printf 'y\n' | ./updater.sh
 printf 'user_pref("privacy.resistFingerprinting.letterboxing", false);\n' > user-overrides.js
-printf 'user_pref("extensions.pocket.enabled", false);\n' > user.overrides.js
-printf 'user_pref("extensions.pocket.site", "");\n' > user.overrides.js
+printf 'user_pref("extensions.pocket.enabled", false);\n' >> user-overrides.js
+printf 'user_pref("extensions.pocket.site", "");\n' >> user-overrides.js
 mkdir -p ~/.local/.share/JetBrains/Toolbox/scripts
 
 # Containers
@@ -144,8 +143,9 @@ podman pull registry.fedoraproject.org/fedora:latest
 # sudo btrfs subvolume snapshot '/home/' "/mnt/snapshot/@home_$(date +%Y%m%d_%H%M%S)"
 # sudo btrfs subvolume snapshot '/'      "/mnt/snapshot/@root_$(date +%Y%m%d_%H%M%S)"
 
+# Cleanup
+test -d ~/Sync && rm -rf ~/Sync
+
 # Remove 2 hour password, i.e. the last two lines of the file.
 sudo sed -i '$d' /etc/sudoers.d/README
 sudo sed -i '$d' /etc/sudoers.d/README
-
-exit 0
