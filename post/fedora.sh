@@ -62,6 +62,7 @@ mkdir -vp \
 # Git
 touch ~/.config/git/config
 git config --global alias.undo 'reset --hard'
+git config --global alias.unadd 'restore --staged'
 git config --global color.status.changed "red normal bold"
 git config --global color.status.untracked "magenta normal bold"
 git config --global color.status.added "green normal bold"
@@ -71,14 +72,31 @@ git config --global init.defaultBranch 'main'
 git config --global user.name "$username"
 git config --global user.email "$username@$(hostname).net"
 
-# Packages
+# Packages: Add Repositories
+# Browser
+sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
+sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+# IDE
+sudo tee -a /etc/yum.repos.d/vscodium.repo << 'EOF'
+[gitlab.com_paulcarroty_vscodium_repo]
+name=gitlab.com_paulcarroty_vscodium_repo
+baseurl=https://paulcarroty.gitlab.io/vscodium-deb-rpm-repo/rpms/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/raw/master/pub.gpg
+metadata_expire=1h
+EOF
+
+# Packages: Removal
 sudo tee -a /etc/dnf/dnf.conf << EOF
 exclude_from_weak=gnome-tour
 exclude_from_weak=rhythmbox
 EOF
 sudo dnf remove  -y gnome-tour rhythmbox
-sudo dnf install -y gnome-tweaks # Show seconds in clock.
 
+# Packages: Install
+sudo dnf install -y gnome-tweaks # Show seconds in clock.
 sudo dnf install -y \
 fira-code-fonts     \
 neofetch            \
@@ -87,23 +105,17 @@ htop                \
 fzf                 \
 qrencode            \
 calcurse            \
-syncthing
+syncthing codium brave-browser
 systemctl --"$username" enable --now syncthing.service # 8384
 
 # Config shell.
 sudo usermod -s /usr/bin/zsh "$username"
+unset username
 cd ~/.config/zsh || fail "$@"
 wget https://raw.githubusercontent.com/whebat/install/main/.zshrc
+wget https://raw.githubusercontent.com/whebat/install/main/.zprofile
 git clone --depth=1 https://github.com/romkatv/gitstatus.git ~/repository/clone/gitstatus
-unset username
-
-# Browser
-sudo dnf config-manager --add-repo https://brave-browser-rpm-release.s3.brave.com/brave-browser.repo
-sudo rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-sudo dnf install -y brave-browser
-
-# IDE
-sudo rpmkeys --import https://gitlab.com/paulcarroty/vscodium-deb-rpm-repo/-/raw/master/pub.gpg
+sudo printf '\n%s\n' 'source ~/.config/zsh/.zprofile' >> /etc/zshenv
 
 # Flatpak
 sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -111,6 +123,7 @@ sudo flatpak remote-modify --enable flathub
 flatpak install -y flathub com.github.Eloston.UngoogledChromium
 flatpak install -y flathub fr.romainvigier.MetadataCleaner
 flatpak install -y flathub md.obsidian.Obsidian
+flatpak install -y fedora # app/org.keepassxc.KeePassXC/x86_64/stable
 
 # Arkenfox
 git clone --depth=1 https://github.com/arkenfox/user.js.git ~/repository/clone/user.js
